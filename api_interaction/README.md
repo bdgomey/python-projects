@@ -1,0 +1,1 @@
+https://newsapi.org APIKey - 19b4b874b94c49edb0886cb7b0ef02e0
