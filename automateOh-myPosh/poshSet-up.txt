@@ -1,6 +1,0 @@
-Import-Module posh-git
-oh-my-posh --init --shell pwsh --config "C:\Users\Brian Gomes\OneDrive - SkillStorm\Desktop\Personal\oh-my-posh.json" | Invoke-Expression
-Set-PSReadLineOption -PredictionSource History
-Set-PSReadLineOption -EditMode Windows
-Set-PSReadLineOption -PredictionViewStyle ListView
-Import-Module -Name Terminal-Icons

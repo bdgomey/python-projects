@@ -1,7 +1,8 @@
 import PySimpleGUI as sg
 import os
-import re
 import subprocess
+from pathlib import PurePath
+import re
 
 
 class OhMyPoshGui:
@@ -13,11 +14,13 @@ class OhMyPoshGui:
         self.ps_profile_result = subprocess.run(["powershell", "-Command", "echo $PROFILE"], capture_output=True)
         self.old_ps_script_path = self.ps_profile_result.stdout.decode().strip()
         self.psScriptPath = re.sub(r"WindowsPowerShell", "PowerShell", self.old_ps_script_path)
+        self.resize_ratio = 2
 
     def oh_my_posh_gui(self):
         window_title = self.window_title
         ps_script_path = self.psScriptPath
         theme_dir = self.theme_dir
+        resize_ratio = self.resize_ratio
 
         menu_def = [["File", ["Command1", "Command2", "Command3"]],
                     ["Menu", ["Settings", "About", "Exit"]]]
@@ -28,7 +31,8 @@ class OhMyPoshGui:
                   [sg.Text('Select your Posh Type', font='Arial')],
                   [sg.InputText(key='-FILE_PATH-'),
                    sg.FilesBrowse(initial_folder=theme_dir, file_types=[("JSON Files", "*.json")]),],
-                  [sg.Button("Submit"), sg.Exit()]]
+                  [sg.Button("Check Theme", key="-THEME-"), sg.Button("Submit"), sg.Exit()]
+                  ]
         # Create the Window
         window = sg.Window('File Loader', layout, finalize=True)
         window.write_event_value("-INIT-", "")
@@ -68,6 +72,32 @@ class OhMyPoshGui:
                 window.disappear()
                 sg.popup(window_title, "Version: 1.0.0", "Installs and Configures Oh My Posh Themes and Oh My Posh Git",
                          grab_anywhere=True)
+
+            if event == "-THEME-":
+                image_path = f"{PurePath("../images")}"
+                images = os.listdir(image_path)
+                file_path = values['-FILE_PATH-']
+                file_parts = file_path.split("/")
+                files = file_parts[len(file_parts) - 1]
+                file_list = files.split(".omp.json")
+                file_name = file_list[0]
+                for image in images:
+                    image_parts = image.split(".png")
+                    image_name = image_parts[0]
+                    if image_name == file_name:
+                        layout = [
+                            [sg.Titlebar("Oh My Posh Themes")],
+                            [sg.Text("Please Select")],
+                            [sg.Image("../images/" + image_name + ".png", key="-IMAGE-")],
+
+                        ]
+                        window = sg.Window('Posh Themes', layout, finalize=True)
+                        while True:
+                            event, values = window.read()
+
+                            if event in (sg.WIN_CLOSED, "Exit"):
+                                exit(0)
+
 
             if event == "Submit":
                 if os.path.exists(values['-FILE_PATH-']):
